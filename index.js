@@ -102,9 +102,7 @@ class Eventy {
       }
     }
     for (let listener of listeners) {
-      listener.call(this, {
-        eventName, args
-      });
+      listener.apply( {eventName}, args );
     }
 
     return this;

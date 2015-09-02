@@ -59,6 +59,9 @@ class Eventy {
     if (!infos.valid) {
       throw 'invalid name';
     }
+    if(typeof callBack !== 'function'){
+      throw 'you must give me a function';
+    }
     let putOn = this._events;
     if (infos.type === 'multi') {
       putOn = this._multiEvents;

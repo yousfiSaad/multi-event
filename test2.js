@@ -1,4 +1,4 @@
-import Eventy from './src/'
+import Eventy from './src/multi-event'
 
 let events = new Eventy();
 

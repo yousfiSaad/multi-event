@@ -2,7 +2,7 @@
   "name": "multi-event",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/multi-event.js",
   "dependencies": {},
   "devDependencies": {
     "babel": "^5.8.21",

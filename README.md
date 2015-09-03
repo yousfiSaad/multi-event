@@ -48,11 +48,11 @@ myEvents.on('event.subevent1', callBack1)
 
 myEvents.emit('event.subevent1', 'this string will be logged twice');
 // the following will be displayed on the console
-//  function 1 says : this string will be logged twice
+//  callBack1 says : this string will be logged twice
 //  callBack says : this string will be logged twice
 myEvents.emit('event.subevent2', 'this string will be logged twice');
 // the following will be displayed on the console
-//  function 2 says : this string will be logged twice
+//  callBack2 says : this string will be logged twice
 //  callBack says : this string will be logged twice
 ```
 

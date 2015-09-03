@@ -18,7 +18,7 @@ module.exports = function(grunt) {
 			// },
 			dist: {
 				files: {
-					'dist/multi-event.js': 'src/multi-event.js'
+					'dist/multi-event.js': 'src/multi-event-es6.js'
 				}
 			}
 		}

@@ -1,13 +1,13 @@
 var assert = require('assert');
-import EventEmitter from './src/multi-event';
+import EventEmitter from './src/multi-event-es6';
 
 ///// some tests from https://github.com/alexanderGugel/micro-events
 
-var _noop = function() {};
+var _noop = () => {};
 
 
-describe('EventEmitter', function() {
-	it('#on() and #emit()', function(done) {
+describe('EventEmitter', () => {
+	it('#on() and #emit()', (done) => {
 		var eventEmitter = new EventEmitter();
 		var originalEvent = {};
 		eventEmitter.on('boom', function(event) {
@@ -17,7 +17,7 @@ describe('EventEmitter', function() {
 		eventEmitter.emit('boom', originalEvent);
 	});
 
-	it('#emit() should work with multiple events in arguments', function(done) {
+	it('#emit() should work with multiple events in arguments', (done) => {
 		var eventEmitter = new EventEmitter();
 		var originalEvent1 = {};
 		var originalEvent2 = {};
@@ -33,7 +33,7 @@ describe('EventEmitter', function() {
 		eventEmitter.emit('boom', originalEvent1, originalEvent2, originalEvent3);
 	});
 
-	it('#on() should only register handler once', function(done) {
+	it('#on() should only register handler once', (done) => {
 		var eventEmitter = new EventEmitter();
 		var originalEvent = {};
 		var handler = function(event) {
@@ -45,21 +45,21 @@ describe('EventEmitter', function() {
 	});
 
 
-	it('functions should return this', function() {
+	it('functions should return this', () => {
 		var eventEmitter = new EventEmitter();
 		assert(eventEmitter.on('boom', _noop), eventEmitter);
 		assert(eventEmitter.emit('boom', _noop), eventEmitter);
 	});
 
-	it('functions should check arguments', function() {
+	it('functions should check arguments', () => {
 		var eventEmitter = new EventEmitter();
-		assert.throws(function() {
+		assert.throws(() => {
 			eventEmitter.on();
 		});
-		assert.throws(function() {
+		assert.throws(() => {
 			eventEmitter.on('boom', 'Not a function');
 		});
-		assert.throws(function() {
+		assert.throws(() => {
 			eventEmitter.emit();
 		});
 	});
@@ -70,16 +70,16 @@ describe('EventEmitter', function() {
 
 describe('MultiEventEmitter', () => {
 	it('#on() and #emit() multi', (done) => {
-    let multiEventEmitter = new EventEmitter();
+		let multiEventEmitter = new EventEmitter();
 
-    multiEventEmitter
-    // .on('a.*.c', function(args){
-    //   console.log('lgi chi 7ajat');
-    // })
-    .on('a.b.c', function(args){
-      // console.log('lgi chi 7aja');
-      done();
-    });
-    multiEventEmitter.emit('a.b.c');
+		multiEventEmitter
+		// .on('a.*.c', function(args){
+		//   console.log('lgi chi 7ajat');
+		// })
+			.on('a.b.c', function(args) {
+			// console.log('lgi chi 7aja');
+			done();
+		});
+		multiEventEmitter.emit('a.b.c');
 	});
 });

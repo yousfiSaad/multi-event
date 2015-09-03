@@ -2,13 +2,13 @@
 
 ## Installation
 
-- **Node.js, browserify** `npm install multi-events --save`
-- **Require.js** `require(["multi-events"], ...`
+- **Node.js, browserify** `npm install multi-event --save`
+- **Require.js** `require(["multi-event"], ...`
 
 ## Examples
 
 ```javascript
-var MultiEvent = require('multi-events'); // require it
+var MultiEvent = require('multi-event'); // require it
 var myEvents = new MultiEvent();
 
 // Implement listener
@@ -28,7 +28,7 @@ myEvents.emit('event', 'this will be passed to the callback');
 ## Multiple events Examples
 
 ```javascript
-var MultiEvent = require('multi-events'); // require it
+var MultiEvent = require('multi-event'); // require it
 var myEvents = new MultiEvent();
 
 // Implement listener

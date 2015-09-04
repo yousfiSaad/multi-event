@@ -57,7 +57,7 @@ myEvents.emit('event.subevent2', 'this string will be logged twice');
 ```
 
 # EcmaScript6
-This module is writed in ES6, you can find the in `src/multi-event-es6.js`
+This module is writen in ES6, you can find the in `src/multi-event-es6.js`
 
 For building your modification run `npm build`, the files `multi-event.js` and `multi-event.min.js` are created in `dist` folder
 

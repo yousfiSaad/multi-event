@@ -60,3 +60,9 @@ myEvents.emit('event.subevent2', 'this string will be logged twice');
 This module is writed in ES6, you can find the in `src/multi-event-es6.js`
 
 For building your modification run `npm build`, the files `multi-event.js` and `multi-event.min.js` are created in `dist` folder
+
+## Build and test
+
+- **Build** `npm run build`
+- **Test** `npm run test`
+- **Watch changes and run tests and buil** `npm run watch`

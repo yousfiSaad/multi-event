@@ -24,7 +24,7 @@ module.exports = function(grunt) {
 		},
 		'watch': {
 			files: ['src/multi-event-es6.js', 'test.js'],
-			tasks: ['mochaTest']
+			tasks: ['mochaTest', 'babel', 'uglify']
 		},
 		'mochaTest': {
 			test: {

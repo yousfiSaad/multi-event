@@ -5,7 +5,6 @@ import EventEmitter from './src/multi-event-es6';
 
 var _noop = () => {};
 
-
 describe('EventEmitter', () => {
 	it('#on() and #emit()', (done) => {
 		var eventEmitter = new EventEmitter();

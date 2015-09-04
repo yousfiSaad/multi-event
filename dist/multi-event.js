@@ -4,220 +4,199 @@
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
-  value: true
+	value: true
 });
 
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i]; return arr2; } else { return Array.from(arr); } }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
-function eventType(eventName) {
-  var ret = {
-    valid: false,
-    type: 'mono', //molti/mono
+var helpers = {
+	eventType: function eventType(eventName) {
+		var ret = {
+			valid: false,
+			type: 'mono', //molti/mono
 
-    splited: []
-  };
-  ret.splited = eventName.split('.');
-  var _iteratorNormalCompletion = true;
-  var _didIteratorError = false;
-  var _iteratorError = undefined;
+			splited: []
+		};
+		ret.splited = eventName.split('.');
+		var _iteratorNormalCompletion = true;
+		var _didIteratorError = false;
+		var _iteratorError = undefined;
 
-  try {
-    for (var _iterator = ret.splited[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-      var part = _step.value;
+		try {
+			for (var _iterator = ret.splited[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+				var part = _step.value;
 
-      var ok = /^[a-z0-9]+$/i.test(part);
-      var ast = part === '*';
-      if (!(ok || ast)) {
-        return ret;
-      }
-      if (ast) {
-        ret.type = 'multi';
-      }
-    }
-  } catch (err) {
-    _didIteratorError = true;
-    _iteratorError = err;
-  } finally {
-    try {
-      if (!_iteratorNormalCompletion && _iterator['return']) {
-        _iterator['return']();
-      }
-    } finally {
-      if (_didIteratorError) {
-        throw _iteratorError;
-      }
-    }
-  }
+				var ok = /^[a-z0-9]+$/i.test(part);
+				var ast = part === '*';
+				if (!(ok || ast)) {
+					return ret;
+				}
+				if (ast) {
+					ret.type = 'multi';
+				}
+			}
+		} catch (err) {
+			_didIteratorError = true;
+			_iteratorError = err;
+		} finally {
+			try {
+				if (!_iteratorNormalCompletion && _iterator['return']) {
+					_iterator['return']();
+				}
+			} finally {
+				if (_didIteratorError) {
+					throw _iteratorError;
+				}
+			}
+		}
 
-  ret.valid = true;
-  ret.name = eventName;
-  return ret;
-}
+		ret.valid = true;
+		ret.name = eventName;
 
-var Eventy = (function () {
-  function Eventy() {
-    _classCallCheck(this, Eventy);
+		return ret;
+	},
+	matches: function matches(pattern) {
+		return function (eName) {
+			var patternCurrent = eName.split('.');
+			if (pattern.length !== patternCurrent.length) {
+				return false;
+			} else {
+				for (var i in pattern) {
+					if (patternCurrent[i] !== '*' && patternCurrent[i] !== pattern[i]) {
+						return false;
+					}
+				}
+			}
 
-    this._events = {};
-    this._multiEvents = {};
+			return true;
+		};
+	}
+};
 
-    this._mapMonoMulti = {};
-  }
+var MultiEvent = (function () {
+	function MultiEvent() {
+		_classCallCheck(this, MultiEvent);
 
-  _createClass(Eventy, [{
-    key: 'getNamesMatchs',
-    value: function getNamesMatchs(patternS) {
-      var eventNames = Object.keys(this._events);
-      var matchs = eventNames.filter(function (eName) {
-        var patternSCurrent = eName.split('.');
-        if (patternS.length !== patternSCurrent.length) {
-          return false;
-        } else {
-          for (var i in patternS) {
-            if (patternS[i] !== '*' && patternSCurrent[i] !== patternS[i]) {
-              return false;
-            }
-          }
-        }
+		this._mapMono = new Map();
+		this._mapMulti = new Map();
+	}
 
-        return true;
-      });
+	_createClass(MultiEvent, [{
+		key: 'on',
+		value: function on(eventName, callBack) {
+			var infos = helpers.eventType(eventName);
+			if (!infos.valid) {
+				throw 'invalid name';
+			}
+			if (typeof callBack !== 'function') {
+				throw 'you must give me a function';
+			}
 
-      return matchs;
-    }
-  }, {
-    key: 'on',
-    value: function on(eventName, callBack) {
-      var infos = eventType(eventName);
-      if (!infos.valid) {
-        throw 'invalid name';
-      }
-      if (typeof callBack !== 'function') {
-        throw 'you must give me a function';
-      }
-      var putOn = this._events;
-      if (infos.type === 'multi') {
-        putOn = this._multiEvents;
-      }
-      putOn[eventName] = putOn[eventName] || [];
-      if (-1 === putOn[eventName].indexOf(callBack)) {
-        putOn[eventName].push(callBack);
-        if (infos.type === 'multi') {
-          this.updateMapSet(infos);
-        }
-      }
+			var mapOfSet = undefined;
+			if (infos['type'] !== 'multi') {
+				mapOfSet = this._mapMono;
+			} else {
+				mapOfSet = this._mapMulti;
+			}
 
-      return this;
-    }
-  }, {
-    key: 'updateMapSet',
-    value: function updateMapSet(infos) {
-      var eventMatchs = this.getNamesMatchs(infos.splited);
-      var _iteratorNormalCompletion2 = true;
-      var _didIteratorError2 = false;
-      var _iteratorError2 = undefined;
+			var setMulti = undefined;
+			if (mapOfSet.has(eventName)) {
+				setMulti = mapOfSet.get(eventName);
+			} else {
+				setMulti = new Set();
+				mapOfSet.set(eventName, setMulti);
+			}
 
-      try {
-        for (var _iterator2 = eventMatchs[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-          var _name = _step2.value;
+			setMulti.add(callBack);
 
-          var set = this._mapMonoMulti[_name] = this._mapMonoMulti[_name] || new Set();
-          set.add(infos.name);
-        }
-      } catch (err) {
-        _didIteratorError2 = true;
-        _iteratorError2 = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion2 && _iterator2['return']) {
-            _iterator2['return']();
-          }
-        } finally {
-          if (_didIteratorError2) {
-            throw _iteratorError2;
-          }
-        }
-      }
-    }
-  }, {
-    key: 'emit',
-    value: function emit(eventName) {
-      var _this = this;
-      var infos = eventType(eventName);
-      if (!infos.valid) {
-        throw 'invalid event';
-      }
-      if (infos.type === 'multi') {
-        throw 'you can not emit multiple events, may be in the next version';
-      }
-      var listeners = [];
-      Array.prototype.push.apply(listeners, this._events[eventName] || []);
-      // let args =  Array.prototype.slice.call(arguments, 1);
-      var set = this._mapMonoMulti[eventName];
-      if (set) {
-        var _iteratorNormalCompletion3 = true;
-        var _didIteratorError3 = false;
-        var _iteratorError3 = undefined;
+			return this;
+		}
+	}, {
+		key: 'emit',
+		value: function emit(eventName) {
+			var infos = helpers.eventType(eventName);
+			if (!infos.valid) {
+				throw 'invalid event';
+			}
+			if (infos.type === 'multi') {
+				throw 'you can not emit multiple events, may be in the next version';
+			}
 
-        try {
-          for (var _iterator3 = set[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-            var _eventName = _step3.value;
+			// get mono callBacks
+			var monoCallBacks = this._mapMono.has(eventName) ? [].concat(_toConsumableArray(this._mapMono.get(eventName))) : [];
+			// get multi callBacks
+			var allMultiNames = [].concat(_toConsumableArray(this._mapMulti.keys()));
 
-            var listenersMulti = _this._multiEvents[_eventName];
-            Array.prototype.push.apply(listeners, listenersMulti);
-          }
-        } catch (err) {
-          _didIteratorError3 = true;
-          _iteratorError3 = err;
-        } finally {
-          try {
-            if (!_iteratorNormalCompletion3 && _iterator3['return']) {
-              _iterator3['return']();
-            }
-          } finally {
-            if (_didIteratorError3) {
-              throw _iteratorError3;
-            }
-          }
-        }
-      }
-      var _iteratorNormalCompletion4 = true;
-      var _didIteratorError4 = false;
-      var _iteratorError4 = undefined;
+			var multiNamesMatches = allMultiNames.filter(helpers.matches(infos.splited));
 
-      try {
-        for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-          args[_key - 1] = arguments[_key];
-        }
+			var multiCallBacks = [];
+			var _iteratorNormalCompletion2 = true;
+			var _didIteratorError2 = false;
+			var _iteratorError2 = undefined;
 
-        for (var _iterator4 = listeners[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-          var listener = _step4.value;
+			try {
+				for (var _iterator2 = multiNamesMatches[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+					var multiNamesMatch = _step2.value;
 
-          listener.apply({ eventName: eventName }, args);
-        }
-      } catch (err) {
-        _didIteratorError4 = true;
-        _iteratorError4 = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion4 && _iterator4['return']) {
-            _iterator4['return']();
-          }
-        } finally {
-          if (_didIteratorError4) {
-            throw _iteratorError4;
-          }
-        }
-      }
+					Array.prototype.push.apply(multiCallBacks, [].concat(_toConsumableArray(this._mapMulti.get(multiNamesMatch))));
+				}
+			} catch (err) {
+				_didIteratorError2 = true;
+				_iteratorError2 = err;
+			} finally {
+				try {
+					if (!_iteratorNormalCompletion2 && _iterator2['return']) {
+						_iterator2['return']();
+					}
+				} finally {
+					if (_didIteratorError2) {
+						throw _iteratorError2;
+					}
+				}
+			}
 
-      return this;
-    }
-  }]);
+			var callBacks = monoCallBacks.concat(multiCallBacks);
 
-  return Eventy;
+			//execute callBacks
+			var _iteratorNormalCompletion3 = true;
+			var _didIteratorError3 = false;
+			var _iteratorError3 = undefined;
+
+			try {
+				for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+					args[_key - 1] = arguments[_key];
+				}
+
+				for (var _iterator3 = callBacks[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+					var callBack = _step3.value;
+
+					callBack.apply({ eventName: eventName }, args);
+				}
+			} catch (err) {
+				_didIteratorError3 = true;
+				_iteratorError3 = err;
+			} finally {
+				try {
+					if (!_iteratorNormalCompletion3 && _iterator3['return']) {
+						_iterator3['return']();
+					}
+				} finally {
+					if (_didIteratorError3) {
+						throw _iteratorError3;
+					}
+				}
+			}
+
+			return this;
+		}
+	}]);
+
+	return MultiEvent;
 })();
 
-exports['default'] = Eventy;
+exports['default'] = MultiEvent;
 module.exports = exports['default'];

@@ -1,117 +1,114 @@
 //     multi-event 1.0.0
 //     (c) 2015 Saad Yousfi <yousfi.saad@gmail.com>
 
+let helpers = {
+	eventType: (eventName) => {
+		let ret = {
+			valid: false,
+			type: 'mono' //molti/mono
+				,
+			splited: []
+		}
+		ret.splited = eventName.split('.');
+		for (let part of ret.splited) {
+			let ok = /^[a-z0-9]+$/i.test(part);
+			let ast = part === '*';
+			if (!(ok || ast)) {
+				return ret;
+			}
+			if (ast) {
+				ret.type = 'multi';
+			}
+		}
+		ret.valid = true;
+		ret.name = eventName;
 
-function eventType(eventName) {
-  let ret = {
-    valid: false,
-    type: 'mono' //molti/mono
-      ,
-    splited: []
-  }
-  ret.splited = eventName.split('.');
-  for (let part of ret.splited) {
-    let ok = /^[a-z0-9]+$/i.test(part);
-    let ast = part === '*';
-    if (!(ok || ast)) {
-      return ret;
-    }
-    if (ast) {
-      ret.type = 'multi';
-    }
-  }
-  ret.valid = true;
-  ret.name = eventName;
-  return ret;
+		return ret;
+	},
+	matches: (pattern) => {
+		return (eName) => {
+			let patternCurrent = eName.split('.');
+			if (pattern.length !== patternCurrent.length) {
+				return false;
+			} else {
+				for (let i in pattern) {
+					if (patternCurrent[i] !== '*' && patternCurrent[i] !== pattern[i]) {
+						return false;
+					}
+				}
+			}
+
+			return true;
+		};
+	}
 }
 
-class Eventy {
-  constructor() {
-    this._events = {};
-    this._multiEvents = {};
+class MultiEvent {
+	constructor() {
+		this._mapMono = new Map();
+		this._mapMulti = new Map();
+	}
 
-    this._mapMonoMulti = {}
-  }
+	on(eventName, callBack) {
+		let infos = helpers.eventType(eventName);
+		if (!infos.valid) {
+			throw 'invalid name';
+		}
+		if (typeof callBack !== 'function') {
+			throw 'you must give me a function';
+		}
 
-  getNamesMatchs(patternS) {
-    let eventNames = Object.keys(this._events);
-    let matchs = eventNames.filter((eName) => {
-      let patternSCurrent = eName.split('.');
-      if (patternS.length !== patternSCurrent.length) {
-        return false;
-      } else {
-        for (let i in patternS) {
-          if (patternS[i] !== '*' && patternSCurrent[i] !== patternS[i]) {
-            return false;
-          }
-        }
-      }
+		let mapOfSet;
+		if (infos['type'] !== 'multi') {
+			mapOfSet = this._mapMono;
+		} else {
+			mapOfSet = this._mapMulti;
+		}
 
-      return true;
-    });
+		let setMulti;
+		if (mapOfSet.has(eventName)) {
+			setMulti = mapOfSet.get(eventName);
+		} else {
+			setMulti = new Set();
+			mapOfSet.set(eventName, setMulti);
+		}
 
-    return matchs;
+		setMulti.add(callBack);
 
-  }
+		return this;
+	}
 
-  on(eventName, callBack) {
-    let infos = eventType(eventName);
-    if (!infos.valid) {
-      throw 'invalid name';
-    }
-    if(typeof callBack !== 'function'){
-      throw 'you must give me a function';
-    }
-    let putOn = this._events;
-    if (infos.type === 'multi') {
-      putOn = this._multiEvents;
-    }
-    putOn[eventName] = putOn[eventName] || [];
-    if (-1 === putOn[eventName].indexOf(callBack)) {
-      putOn[eventName].push(callBack);
-      if (infos.type === 'multi') {
-        this.updateMapSet(infos);
-      }
-    }
+	emit(eventName, ...args){
+		let infos = helpers.eventType(eventName);
+		if (!infos.valid) {
+			throw 'invalid event';
+		}
+		if (infos.type === 'multi') {
+			throw 'you can not emit multiple events, may be in the next version';
+		}
 
-    return this;
-  }
+		// get mono callBacks
+		let monoCallBacks = this._mapMono.has(eventName) ? [...this._mapMono.get(eventName)] : [];
+		// get multi callBacks
+		let allMultiNames = [...this._mapMulti.keys()];
 
-  updateMapSet(infos) {
-    let eventMatchs = this.getNamesMatchs(infos.splited);
-    for (let name of eventMatchs) {
-      let set = this._mapMonoMulti[name] = this._mapMonoMulti[name] || new Set();
-      set.add(infos.name);
-    }
-  }
+		let multiNamesMatches = allMultiNames.filter(helpers.matches(infos.splited));
 
-  emit(eventName, ...args) {
-    let _this = this;
-    let infos = eventType(eventName);
-    if (!infos.valid) {
-      throw 'invalid event';
-    }
-    if (infos.type === 'multi') {
-      throw 'you can not emit multiple events, may be in the next version';
-    }
-    let listeners = [];
-    Array.prototype.push.apply(listeners, this._events[eventName] || []);
-    // let args =  Array.prototype.slice.call(arguments, 1);
-    let set = this._mapMonoMulti[eventName];
-    if (set) {
-      for (let eventName of set) {
-        let listenersMulti = _this._multiEvents[eventName];
-        Array.prototype.push.apply(listeners, listenersMulti);
-      }
-    }
-    for (let listener of listeners) {
-      listener.apply( {eventName}, args );
-    }
+		let multiCallBacks = [];
+		for(let multiNamesMatch of multiNamesMatches){
+			Array.prototype.push.apply(multiCallBacks, [...this._mapMulti.get(multiNamesMatch)]);
+		}
 
-    return this;
-  }
+		let callBacks = monoCallBacks.concat(multiCallBacks)
+
+		//execute callBacks
+		for(let callBack of callBacks){
+			callBack.apply({eventName}, args);
+		}
+
+		return this;
+	}
 
 }
 
-
-export default Eventy;
+export default MultiEvent;

@@ -21,8 +21,27 @@ module.exports = function(grunt) {
 					'dist/multi-event.js': 'src/multi-event-es6.js'
 				}
 			}
+		},
+		'watch': {
+			files: ['src/multi-event-es6.js', 'test.js'],
+			tasks: ['mochaTest']
+		},
+		'mochaTest': {
+			test: {
+				options: {
+					reporter: 'spec',
+					require: 'babel/register'
+				},
+				src: ['test.js']
+			}
 		}
 	});
+
+
+	// Add the grunt-mocha-test tasks.
+	grunt.loadNpmTasks('grunt-mocha-test');
+
+	grunt.loadNpmTasks('grunt-contrib-watch');
 
 	grunt.loadNpmTasks('grunt-contrib-uglify');
 

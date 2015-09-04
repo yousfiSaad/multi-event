@@ -73,13 +73,24 @@ describe('MultiEventEmitter', () => {
 		let multiEventEmitter = new EventEmitter();
 
 		multiEventEmitter
-		// .on('a.*.c', function(args){
-		//   console.log('lgi chi 7ajat');
-		// })
-			.on('a.b.c', function(args) {
-			// console.log('lgi chi 7aja');
+			.on('a.*.c', function multi(args) {
 			done();
 		});
 		multiEventEmitter.emit('a.b.c');
+	});
+	it('#on() and #emit() listen on two events', (done) => {
+		let multiEventEmitter = new EventEmitter();
+
+		let countCalls = 0;
+
+		multiEventEmitter
+			.on('a.b.*', function multi(args) {
+				countCalls ++;
+		});
+		multiEventEmitter.emit('a.b.x');
+		multiEventEmitter.emit('a.b.y');
+
+		assert(countCalls, 2);
+		done();
 	});
 });

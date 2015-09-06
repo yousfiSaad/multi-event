@@ -43,8 +43,8 @@ var callBack = function (arg) {
 
 // Register callBack event listener
 myEvents.on('event.subevent1', callBack1)
-        .on('event.subevent2', callBack2);
-        .on('event.*', callBack); // this callnack is trigged to all 'event' sub-events
+        .on('event.subevent2', callBack2)
+        .on('event.*', callBack); // this callBack is trigged to all 'event' sub-events
 
 myEvents.emit('event.subevent1', 'this string will be logged twice');
 // the following will be displayed on the console
@@ -59,7 +59,7 @@ myEvents.emit('event.subevent2', 'this string will be logged twice');
 # EcmaScript6
 This module is writen in ES6, you can find the in `src/multi-event-es6.js`
 
-For building your modification run `npm build`, the files `multi-event.js` and `multi-event.min.js` are created in `dist` folder
+For building your modification run `npm run build`, the files `multi-event.js` and `multi-event.min.js` are created in `dist` folder
 
 ## Build and test
 

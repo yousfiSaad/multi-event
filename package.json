@@ -33,7 +33,7 @@
     "es2015"
   ],
   "author": "Saad Y <yousfi.saad@gmail.com> (https://github.com/yousfiSaad/)",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/yousfiSaad/multi-event/issues"
   },

@@ -73,7 +73,7 @@ describe('MultiEventEmitter', () => {
 
 		multiEventEmitter
 			.on('a.*.c', function multi(args) {
-			done();
+				done();
 		});
 		multiEventEmitter.emit('a.b.c');
 	});

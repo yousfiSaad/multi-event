@@ -2,45 +2,44 @@
 //     (c) 2015 Saad Yousfi <yousfi.saad@gmail.com>
 
 let helpers = {
-	eventType: (eventName) => {
-		let ret = {
-			valid: false,
-			type: 'mono' //molti/mono
-				,
-			splited: []
-		}
-		ret.splited = eventName.split('.');
-		for (let part of ret.splited) {
-			let ok = /^[a-z0-9]+$/i.test(part);
-			let ast = part === '*';
-			if (!(ok || ast)) {
-				return ret;
+	eventType(eventName) {
+			let ret = {
+				valid: false,
+				type: 'mono', //molti/mono
+				splited: []
 			}
-			if (ast) {
-				ret.type = 'multi';
-			}
-		}
-		ret.valid = true;
-		ret.name = eventName;
-
-		return ret;
-	},
-	matches: (pattern) => {
-		return (eName) => {
-			let patternCurrent = eName.split('.');
-			if (pattern.length !== patternCurrent.length) {
-				return false;
-			} else {
-				for (let i in pattern) {
-					if (patternCurrent[i] !== '*' && patternCurrent[i] !== pattern[i]) {
-						return false;
-					}
+			ret.splited = eventName.split('.');
+			for (let part of ret.splited) {
+				let ok = /^[a-z0-9]+$/i.test(part);
+				let ast = part === '*';
+				if (!(ok || ast)) {
+					return ret;
+				}
+				if (ast) {
+					ret.type = 'multi';
 				}
 			}
+			ret.valid = true;
+			ret.name = eventName;
 
-			return true;
-		};
-	}
+			return ret;
+		},
+
+		matches(pattern) {
+			return function(eName) {
+				let patternCurrent = eName.split('.');
+				if (pattern.length !== patternCurrent.length) {
+					return false;
+				} else {
+					for (let i in pattern) {
+						if (patternCurrent[i] !== '*' && patternCurrent[i] !== pattern[i]) {
+							return false;
+						}
+					}
+				}
+				return true;
+			};
+		}
 }
 
 class MultiEvent {
@@ -78,7 +77,7 @@ class MultiEvent {
 		return this;
 	}
 
-	emit(eventName, ...args){
+	emit(eventName, ...args) {
 		let infos = helpers.eventType(eventName);
 		if (!infos.valid) {
 			throw 'invalid event';
@@ -95,15 +94,17 @@ class MultiEvent {
 		let multiNamesMatches = allMultiNames.filter(helpers.matches(infos.splited));
 
 		let multiCallBacks = [];
-		for(let multiNamesMatch of multiNamesMatches){
+		for (let multiNamesMatch of multiNamesMatches) {
 			Array.prototype.push.apply(multiCallBacks, [...this._mapMulti.get(multiNamesMatch)]);
 		}
 
 		let callBacks = monoCallBacks.concat(multiCallBacks)
 
 		//execute callBacks
-		for(let callBack of callBacks){
-			callBack.apply({eventName}, args);
+		for (let callBack of callBacks) {
+			callBack.apply({
+				eventName
+			}, args);
 		}
 
 		return this;

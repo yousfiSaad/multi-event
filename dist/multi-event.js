@@ -18,7 +18,6 @@ var helpers = {
 		var ret = {
 			valid: false,
 			type: 'mono', //molti/mono
-
 			splited: []
 		};
 		ret.splited = eventName.split('.');
@@ -59,6 +58,7 @@ var helpers = {
 
 		return ret;
 	},
+
 	matches: function matches(pattern) {
 		return function (eName) {
 			var patternCurrent = eName.split('.');
@@ -71,7 +71,6 @@ var helpers = {
 					}
 				}
 			}
-
 			return true;
 		};
 	}
@@ -174,7 +173,9 @@ var MultiEvent = (function () {
 				for (var _iterator3 = callBacks[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
 					var callBack = _step3.value;
 
-					callBack.apply({ eventName: eventName }, args);
+					callBack.apply({
+						eventName: eventName
+					}, args);
 				}
 			} catch (err) {
 				_didIteratorError3 = true;

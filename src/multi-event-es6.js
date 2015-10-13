@@ -1,4 +1,4 @@
-//     multi-event 1.0.0
+//     multi-event 1.0.3
 //     (c) 2015 Saad Yousfi <yousfi.saad@gmail.com>
 
 let helpers = {

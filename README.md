@@ -66,3 +66,7 @@ For building your modification run `npm run build`, the files `multi-event.js` a
 - **Build** `npm run build`
 - **Test** `npm run test`
 - **Watch changes and run tests and buil** `npm run watch`
+
+
+## Todo
+- pipe ("event.*, anotheremitter)

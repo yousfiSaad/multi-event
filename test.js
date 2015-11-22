@@ -70,6 +70,7 @@ describe('Pipe EventsSubSet', ()=>{
 	let mtTwo = new EventEmitter();
 
 	mtOne.pipe('subSet.*', mtTwo);
+
 	it('#on event in the sub set (basic test)', (done)=>{
 		mtTwo.on('subSet.pipeEventOk', (...arg)=>{
 			if(arg.length === 2 && arg[0] === 'an argument' && arg[1] === 'another'){
@@ -77,6 +78,21 @@ describe('Pipe EventsSubSet', ()=>{
 			}
 		});
 		mtOne.emit('subSet.pipeEventOk', 'an argument', 'another');
+	});
+
+	it('#on event in the wrong sub set', (done)=>{
+		mtTwo.on('subSet.pipeEventOk2', (...arg)=>{
+			if(arg.length === 2 && arg[0] === 'an argument' && arg[1] === 'another'){
+				done();
+			}
+		});
+		mtTwo.on('subSet2.pipeEventOk2', (...arg)=>{
+			if(arg.length === 2 && arg[0] === 'an argument' && arg[1] === 'another'){
+				done("error");
+			}
+		});
+		mtOne.emit('subSet2.pipeEventOk2', 'an argument', 'another');
+		mtOne.emit('subSet.pipeEventOk2', 'an argument', 'another');
 	});
 });
 

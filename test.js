@@ -63,9 +63,22 @@ describe('EventEmitter', () => {
 		});
 	});
 
-
 });
 
+describe('Pipe EventsSubSet', ()=>{
+	let mtOne = new EventEmitter();
+	let mtTwo = new EventEmitter();
+
+	mtOne.pipe('subSet.*', mtTwo);
+	it('#on event in the sub set (basic test)', (done)=>{
+		mtTwo.on('subSet.pipeEventOk', (...arg)=>{
+			if(arg.length === 2 && arg[0] === 'an argument' && arg[1] === 'another'){
+				done();
+			}
+		});
+		mtOne.emit('subSet.pipeEventOk', 'an argument', 'another');
+	});
+});
 
 describe('MultiEventEmitter', () => {
 	it('#on() and #emit() multi', (done) => {

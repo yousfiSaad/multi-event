@@ -93,6 +93,7 @@ class MultiEvent {
 
 		let multiNamesMatches = allMultiNames.filter(helpers.matches(infos.splited));
 
+		// get multiCallBacks
 		let multiCallBacks = [];
 		for (let multiNamesMatch of multiNamesMatches) {
 			Array.prototype.push.apply(multiCallBacks, [...this._mapMulti.get(multiNamesMatch)]);
@@ -110,6 +111,11 @@ class MultiEvent {
 		return this;
 	}
 
+	pipe(subEventPatternAsString, eventEmitter){
+		this.on(subEventPatternAsString, function (...args){
+			eventEmitter.emit(this.eventName, ...args);
+		});
+	}
 }
 
 export default MultiEvent;

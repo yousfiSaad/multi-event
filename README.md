@@ -27,6 +27,9 @@ myEvents.emit('event', 'this will be passed to the callback');
 ```javascript
 var MultiEvent = require('multi-event'); // require it
 var myEvents = new MultiEvent();
+var myEventsSubSet = new MultiEvent();
+
+myEvents.pipe("event2.*", myEventsSubSet);
 
 // Implement listener
 var callBack1 = function (arg) {
@@ -40,11 +43,17 @@ var callBack = function (arg) {
     console.log('callBack says : '+ arg);
 };
 
+var pipeCallBack = function (arg) {
+    console.log('pipeCallBack says : '+ arg + ' (from myEventsSubSet)');
+};
+
 
 // Register callBack event listener
 myEvents.on('event.subevent1', callBack1)
         .on('event.subevent2', callBack2)
         .on('event.*', callBack); // this callBack is trigged to all 'event' sub-events
+        
+myEventsSubSet.on("event2.eventViaPipe", pipeCallBack);
 
 myEvents.emit('event.subevent1', 'this string will be logged twice');
 // the following will be displayed on the console
@@ -54,6 +63,10 @@ myEvents.emit('event.subevent2', 'this string will be logged twice');
 // the following will be displayed on the console
 //  callBack2 says : this string will be logged twice
 //  callBack says : this string will be logged twice
+
+myEvents.emit('event2.eventViaPipe', 'this will be passed to the other emitter also');
+// the following will be displayed on the console
+//  pipeCallBack says : this will be passed to the other emitter also (from myEventsSubSet)
 ```
 
 # EcmaScript6
@@ -67,6 +80,3 @@ For building your modification run `npm run build`, the files `multi-event.js` a
 - **Test** `npm run test`
 - **Watch changes and run tests and buil** `npm run watch`
 
-
-## Todo
-- pipe ("event.*, anotheremitter)

@@ -94,6 +94,24 @@ describe('Pipe EventsSubSet', ()=>{
 		mtOne.emit('subSet2.pipeEventOk2', 'an argument', 'another');
 		mtOne.emit('subSet.pipeEventOk2', 'an argument', 'another');
 	});
+
+	it('prevent loops', (done)=>{
+		let eventE1 = new EventEmitter(),
+				eventE2 = new EventEmitter();
+
+		eventE1.pipe('loop.*', eventE2);
+		eventE1.pipe('noLoop.*', eventE2);
+		eventE2.pipe('loop.*', eventE1);
+		eventE1.on('loop.event', ()=>{
+			done('error');
+		});
+		eventE2.on('noLoop.event', ()=>{
+			done('error');
+		});
+		eventE1.emit('loop.event');
+		eventE2.emit('noLoop');
+	});
+
 });
 
 describe('MultiEventEmitter', () => {
